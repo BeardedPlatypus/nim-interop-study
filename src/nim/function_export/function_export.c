@@ -1,6 +1,6 @@
 #include "function_export.h"
 
-float cadd(float a, float b) 
+double cadd(double a, double b) 
 {
     return a + b;
 }
