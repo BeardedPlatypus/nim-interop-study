@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using function_export.main;
 
+NimSource.NimMain();
+
 int nameSize = NimSource.get_name_size();
 StringBuilder buffer = new(nameSize);
 NimSource.get_name(buffer);
