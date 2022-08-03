@@ -14,13 +14,15 @@ module public Main =
 
     type public Msg =
         | RequestOpenVisualStudioCode
+        | UpdateFiles of List<string>
         | NoOp
 
-    let public init (): Model * CmdMsg list = { files = [ "a.nim"; "b.nim" ] }, [ CmdMsg.Initialize ]
+    let public init (): Model * CmdMsg list = { files = [ ] }, [ CmdMsg.Initialize ]
 
     let public update (msg: Msg) (model: Model) : Model * CmdMsg list =
         match msg with 
         | RequestOpenVisualStudioCode -> model, [CmdMsg.OpenVisualStudioCode]
+        | UpdateFiles newFiles -> { model with files = newFiles }, []
         | NoOp -> model, []
 
     let bindings () : Binding<Model, Msg> list = [
