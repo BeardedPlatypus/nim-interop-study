@@ -6,6 +6,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:iconPacks="http://metro.mahapps.com/winfx/xaml/iconpacks"
+        xmlns:components="clr-namespace:type_description_export.presentation.views.Components"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
@@ -57,4 +58,17 @@
             </Button>
         </mah:WindowCommands>
     </mah:MetroWindow.RightWindowCommands>
+
+    <DockPanel LastChildFill="True">
+        <components:ConsoleDisplay DockPanel.Dock="Bottom"
+                                   Height="300"/>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <components:SourceCodeDisplay Grid.Column="0"/>
+            <components:ObjectDisplay Grid.Column="1"/>
+        </Grid>
+    </DockPanel>
 </mah:MetroWindow>
