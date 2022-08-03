@@ -4,7 +4,7 @@ open Elmish.WPF
 
 module public Main =
     type public Model = 
-      { todo : bool
+      { files: List<string>
       }
 
     [<RequireQualifiedAccess>]
@@ -16,7 +16,7 @@ module public Main =
         | RequestOpenVisualStudioCode
         | NoOp
 
-    let public init (): Model * CmdMsg list = { todo = true }, [ CmdMsg.Initialize ]
+    let public init (): Model * CmdMsg list = { files = [ "a.nim"; "b.nim" ] }, [ CmdMsg.Initialize ]
 
     let public update (msg: Msg) (model: Model) : Model * CmdMsg list =
         match msg with 
@@ -25,4 +25,5 @@ module public Main =
 
     let bindings () : Binding<Model, Msg> list = [
           "OpenVisualStudioCommand" |> Binding.cmd(fun (_) -> Msg.RequestOpenVisualStudioCode)
+          "FileNames" |> Binding.oneWay(fun (m: Model) -> m.files)
     ]

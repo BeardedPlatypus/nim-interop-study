@@ -21,11 +21,12 @@
                         <TextBlock>Open in VS Code</TextBlock>
                     </Button>
                     <ScrollViewer DockPanel.Dock="Bottom">
-                        <ListBox >
-                            <TextBlock Text="Plain" />
-                            <TextBlock Text="Old" />
-                            <TextBlock Text="ListBox" />
-                            <TextBlock Text="Full of junk" />
+                        <ListBox ItemsSource="{Binding FileNames}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
                         </ListBox>
                     </ScrollViewer>
                 </DockPanel>
