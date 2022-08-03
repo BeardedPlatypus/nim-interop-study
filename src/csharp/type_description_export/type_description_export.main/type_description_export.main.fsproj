@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\type_description_export.infrastructure\type_description_export.infrastructure.fsproj" />
     <ProjectReference Include="..\type_description_export.presentation.views\type_description_export.presentation.views.csproj" />
     <ProjectReference Include="..\type_description_export.presentation\type_description_export.presentation.fsproj" />
   </ItemGroup>
