@@ -15,6 +15,8 @@ type ComponentDescription* =
 # Because these variables are only used to construct the final exported methods, they
 # are defined with compileTime pragma's.
 var component_descriptions {.compileTime.}: seq[ComponentDescription] = @[]
+var n_components {.compileTime.}: int = 0
+
 var type_name_to_index {.compileTime.} = initTable[string, int]()
 var index_to_type_name {.compileTime.}: seq[string] = @[]
 var n_types {.compileTime.}: int = 0
@@ -25,6 +27,7 @@ proc retrieveType(t: NimNode): NimNode {.compileTime.} =
 
 # exportComponent should be used to export types from custom nim files.
 macro exportComponent*(t: typedesc): untyped =
+  n_components += 1
   let t_desc = retrieveType(t)
   let t_desc_name : string = $(t)
 
@@ -51,30 +54,13 @@ macro exportComponent*(t: typedesc): untyped =
 
 # constructComponentDescriptions is used by the main nim file to construct the descriptions.
 macro constructComponentDescriptions*(): untyped =
-  let n_components: int = len(component_descriptions)
   let n_components_lit = newLit(n_components)
 
-  type
-    DescriptionArray = array[len(component_descriptions), ComponentDescription]
-  var description_array: DescriptionArray
+  echo n_types
+  echo array[1, string]
 
-  var i: int = 0
-  for desc in component_descriptions:
-      description_array[i] = desc
-      i += 1
-
-  type
-    TypeArray = array[n_types, string]
-
-  var type_array: TypeArray
-
-  var j: int = 0
-  for t in index_to_type_name:
-      type_array[j] = t
-      j += 1
-
-  let type_names_lit = newLit(type_array)
-  let descriptions_lit = newLit(description_array)
+  let type_names_lit = newLit(index_to_type_name)
+  let descriptions_lit = newLit(component_descriptions)
 
   # Generate the actual c-api.
   quote do:
