@@ -23,6 +23,7 @@ module public Main =
         | OpenVisualStudioCode
         | LoadSourceContent of CachedChangeFile
         | RequestSetSelectedFile of option<string>
+        | Compile of List<string>
 
     type public Msg =
         | RequestOpenVisualStudioCode
@@ -51,7 +52,7 @@ module public Main =
     let public update (msg: Msg) (model: Model) : Model * CmdMsg list =
         match msg with 
         | RequestOpenVisualStudioCode -> model, [CmdMsg.OpenVisualStudioCode]
-        | RequestCompile -> model, []
+        | RequestCompile -> model, [CmdMsg.Compile model.files]
         | UpdateFiles newFiles -> { model with files = newFiles }, []
         | AddFile newFile -> 
             // Assumption: this will not be an expensive operation given the size of files.

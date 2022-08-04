@@ -39,9 +39,18 @@ module public CmdMapping =
     let private setSelectedFileCmd (fileName: option<string>) : Cmd<Msg> =
         Cmd.ofMsg (Msg.SetSelectedFile fileName)
 
+    let private compileCmd (v: list<string>) : Cmd<Msg> =
+        async {
+            do! Async.SwitchToThreadPool ()
+            SourceCode.writeCustomTypesFile "./nim/custom_types.nim" v
+
+            return Msg.NoOp
+        } |> Cmd.OfAsync.result
+
     let public toCmd (cmdMsg: CmdMsg) : Cmd<Msg> =
         match cmdMsg with
         | CmdMsg.Initialize -> initializeCmd ()  
         | CmdMsg.OpenVisualStudioCode -> openVisualStudioCodeCmd ()
         | CmdMsg.LoadSourceContent v -> loadSourceContentCmd v
         | CmdMsg.RequestSetSelectedFile v -> setSelectedFileCmd v
+        | CmdMsg.Compile v -> compileCmd v
