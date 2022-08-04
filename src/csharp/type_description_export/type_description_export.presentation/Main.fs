@@ -5,6 +5,7 @@ open Elmish.WPF
 module public Main =
     type public Model = 
       { files: List<string>
+        selectedFile: option<string>
         sourceContent: option<string>
       }
 
@@ -20,9 +21,14 @@ module public Main =
         | AddFile of string
         | RemoveFile of string
         | RenameFile of {| oldFile: string; newFile: string |}
+        | SetSelectedFile of option<string>
         | NoOp
 
-    let public init (): Model * CmdMsg list = { files = [ ]; sourceContent = option.None }, [ CmdMsg.Initialize ]
+    let public init (): Model * CmdMsg list = 
+        { files = [ ]
+          selectedFile = option.None
+          sourceContent = option.None 
+        }, [ CmdMsg.Initialize ]
 
     let public update (msg: Msg) (model: Model) : Model * CmdMsg list =
         match msg with 
@@ -39,10 +45,15 @@ module public Main =
             let newFiles = details.newFile :: model.files |> List.filter (fun s -> s <> details.oldFile)
                            |> List.sort
             { model with files = newFiles }, []
+        | SetSelectedFile v -> { model with selectedFile = v }, []
         | NoOp -> model, []
 
     let bindings () : Binding<Model, Msg> list = [
           "OpenVisualStudioCommand" |> Binding.cmd(fun (_) -> Msg.RequestOpenVisualStudioCode)
           "FileNames" |> Binding.oneWay(fun (m: Model) -> m.files)
+          "SelectedFile" |> Binding.twoWayOpt(
+              (fun (m: Model) -> m.selectedFile),
+              (fun v _ -> SetSelectedFile v)
+          )
           "SourceContent" |> Binding.oneWay(fun (m: Model) -> m.sourceContent |> Option.defaultValue "<No file selected>")
     ]

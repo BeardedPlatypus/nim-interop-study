@@ -21,7 +21,8 @@
                         <TextBlock>Open in VS Code</TextBlock>
                     </Button>
                     <ScrollViewer DockPanel.Dock="Bottom">
-                        <ListBox ItemsSource="{Binding FileNames}">
+                        <ListBox ItemsSource="{Binding FileNames}"
+                                 SelectedValue="{Binding SelectedFile}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <TextBlock Text="{Binding}"/>
