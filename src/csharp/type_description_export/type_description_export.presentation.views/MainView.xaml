@@ -60,8 +60,6 @@
     </mah:MetroWindow.RightWindowCommands>
 
     <DockPanel LastChildFill="True">
-        <components:ConsoleDisplay DockPanel.Dock="Bottom"
-                                   Height="300"/>
         <Grid DockPanel.Dock="Top">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
