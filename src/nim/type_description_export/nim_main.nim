@@ -1,0 +1,1 @@
+# Placeholder file to generate a NimMain method.
