@@ -7,6 +7,9 @@ module public Main =
       { files: List<string>
         selectedFile: option<string>
         sourceContent: option<string>
+        types: List<string>
+        selectedType: option<string>
+        typeContent: option<string>
       }
 
     type public CachedChangeFile = 
@@ -23,6 +26,7 @@ module public Main =
 
     type public Msg =
         | RequestOpenVisualStudioCode
+        | RequestCompile
         | UpdateFiles of List<string>
         // These could be combined
         | AddFile of string
@@ -31,6 +35,7 @@ module public Main =
         | ChangeFile of string
         | ChangeFileCached of CachedChangeFile
         | SetSelectedFile of option<string>
+        | SetSelectedType of option<string>
         | NoOp
         | UpdateSourceContent of option<string>
 
@@ -38,11 +43,15 @@ module public Main =
         { files = [ ]
           selectedFile = option.None
           sourceContent = option.None 
+          types = []
+          selectedType = option.None
+          typeContent = option.None
         }, [ CmdMsg.Initialize ]
 
     let public update (msg: Msg) (model: Model) : Model * CmdMsg list =
         match msg with 
         | RequestOpenVisualStudioCode -> model, [CmdMsg.OpenVisualStudioCode]
+        | RequestCompile -> model, []
         | UpdateFiles newFiles -> { model with files = newFiles }, []
         | AddFile newFile -> 
             // Assumption: this will not be an expensive operation given the size of files.
@@ -79,15 +88,24 @@ module public Main =
         | SetSelectedFile v -> 
             { model with selectedFile = v }, 
             [ CmdMsg.LoadSourceContent { fileName = v; retryCount = 0 } ]
+        | SetSelectedType v -> 
+            { model with selectedType = v }, [ ]
         | UpdateSourceContent v -> {model with sourceContent = v }, []
         | NoOp -> model, []
 
     let bindings () : Binding<Model, Msg> list = [
-          "OpenVisualStudioCommand" |> Binding.cmd(fun (_) -> Msg.RequestOpenVisualStudioCode)
-          "FileNames" |> Binding.oneWay(fun (m: Model) -> m.files)
+          "OpenVisualStudioCommand" |> Binding.cmd (fun (_) -> Msg.RequestOpenVisualStudioCode)
+          "FileNames" |> Binding.oneWay (fun (m: Model) -> m.files)
           "SelectedFile" |> Binding.twoWayOpt(
               (fun (m: Model) -> m.selectedFile),
               (fun v _ -> SetSelectedFile v)
           )
-          "SourceContent" |> Binding.oneWay(fun (m: Model) -> m.sourceContent |> Option.defaultValue "<No file selected>")
+          "SourceContent" |> Binding.oneWay (fun (m: Model) -> m.sourceContent |> Option.defaultValue "<No file selected>")
+          "Types" |> Binding.oneWay (fun (m: Model) -> m.types)
+          "SelectedType" |> Binding.twoWayOpt(
+              (fun (m: Model) -> m.selectedType),
+              (fun v _ -> SetSelectedType v)
+          )
+          "TypeContent" |> Binding.oneWay (fun (m: Model) -> m.typeContent |> Option.defaultValue "<no type selected>")
+          "CompileCommand" |> Binding.cmd (fun (_) -> Msg.RequestCompile)
     ]
