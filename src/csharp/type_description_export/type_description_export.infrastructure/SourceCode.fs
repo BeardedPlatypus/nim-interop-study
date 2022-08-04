@@ -28,3 +28,9 @@ module public SourceCode =
         policy.AbsoluteExpiration <- System.DateTimeOffset.Now.AddSeconds(0.5)
         MemoryCache.Default.AddOrGetExisting(key, item, policy) |> ignore
 
+    let public writeCustomTypesFile (path: string) (typeFiles: list<string>): unit =
+        typeFiles 
+        |> List.map Path.GetFileNameWithoutExtension
+        |> List.map (fun name -> $"import custom-types/{name}")
+        |> fun lines -> File.WriteAllLines(path, lines)
+ 
