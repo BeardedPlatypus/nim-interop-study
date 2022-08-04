@@ -40,11 +40,13 @@ module public Main =
             { model with files = newFiles }, []
         | RemoveFile toRemove ->
             let newFiles = model.files |> List.filter (fun s -> s <> toRemove)
-            { model with files = newFiles }, []
+            let newSelectedFile = if (Some toRemove) = model.selectedFile then None else model.selectedFile
+            { model with files = newFiles; selectedFile = newSelectedFile }, []
         | RenameFile details ->
             let newFiles = details.newFile :: model.files |> List.filter (fun s -> s <> details.oldFile)
                            |> List.sort
-            { model with files = newFiles }, []
+            let newSelectedFile = if (Some details.oldFile) = model.selectedFile then None else model.selectedFile
+            { model with files = newFiles; selectedFile = newSelectedFile }, []
         | SetSelectedFile v -> { model with selectedFile = v }, []
         | NoOp -> model, []
 
