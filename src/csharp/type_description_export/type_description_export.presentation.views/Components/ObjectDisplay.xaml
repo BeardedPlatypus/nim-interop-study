@@ -8,10 +8,37 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <materialDesign:Card Margin="3">
-        <GroupBox Header="Object Display">
-            <TextBlock Margin="6,6,6,6"
-                       TextWrapping="Wrap"
-                       Text="Short loin picanha boudin pork belly. Ground round porchetta biltong, cow t-bone tri-tip strip steak chuck filet mignon jowl turducken. Landjaeger strip steak pork chop, jowl sirloin pork capicola andouille. Kevin ribeye tongue, drumstick hamburger frankfurter t-bone corned beef beef biltong cow venison. Biltong picanha bresaola pork belly, filet mignon spare ribs doner pork chop kielbasa. Swine flank drumstick pork belly pancetta spare ribs rump filet mignon." />
+        <GroupBox Header="Types">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+                <DockPanel Grid.Column="0" LastChildFill="True">
+                    <Button DockPanel.Dock="Bottom" 
+                            Margin="2"
+                            Command="{Binding CompileCommand}">
+                        <TextBlock>Compile</TextBlock>
+                    </Button>
+                    <ScrollViewer DockPanel.Dock="Bottom">
+                        <ListBox ItemsSource="{Binding Types}"
+                                 SelectedValue="{Binding SelectedType}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </ScrollViewer>
+                </DockPanel>
+                
+                <ScrollViewer Grid.Column="1">
+                    <TextBlock Margin="6,6,6,6"
+                               TextWrapping="Wrap"
+                               Text="{Binding TypeContent}" />
+                </ScrollViewer>
+            </Grid>
         </GroupBox>
     </materialDesign:Card>
 </UserControl>
