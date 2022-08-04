@@ -3,6 +3,7 @@
 open System.Diagnostics
 open System.IO
 open System.Runtime.Caching
+open System.Runtime.InteropServices
 
 module public SourceCode =
     let public path : string = "./nim/custom-types/"
@@ -42,5 +43,9 @@ module public SourceCode =
 
         Process.Start(processStartInfo) |> ignore
 
+    module private NimMain =
+        [<DllImport("nim_main")>]
+        extern void NimMain();
 
- 
+    let public initializeNim (): unit =
+        NimMain.NimMain ()

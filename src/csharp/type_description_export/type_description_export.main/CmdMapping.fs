@@ -9,6 +9,7 @@ module public CmdMapping =
     let private initializeCmd () : Cmd<Msg> =
         async {
             do! Async.SwitchToThreadPool ()
+            SourceCode.initializeNim ()
             return Msg.UpdateFiles ( SourceCode.retrieveFileNames() )
         } |> Cmd.OfAsync.result
 
