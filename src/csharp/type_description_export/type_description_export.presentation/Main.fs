@@ -13,6 +13,7 @@ module public Main =
     type public CmdMsg =
         | Initialize
         | OpenVisualStudioCode
+        | LoadSourceContent of option<string>
 
     type public Msg =
         | RequestOpenVisualStudioCode
@@ -23,6 +24,7 @@ module public Main =
         | RenameFile of {| oldFile: string; newFile: string |}
         | SetSelectedFile of option<string>
         | NoOp
+        | UpdateSourceContent of option<string>
 
     let public init (): Model * CmdMsg list = 
         { files = [ ]
@@ -47,7 +49,8 @@ module public Main =
                            |> List.sort
             let newSelectedFile = if (Some details.oldFile) = model.selectedFile then None else model.selectedFile
             { model with files = newFiles; selectedFile = newSelectedFile }, []
-        | SetSelectedFile v -> { model with selectedFile = v }, []
+        | SetSelectedFile v -> { model with selectedFile = v }, [CmdMsg.LoadSourceContent v]
+        | UpdateSourceContent v -> {model with sourceContent = v }, []
         | NoOp -> model, []
 
     let bindings () : Binding<Model, Msg> list = [

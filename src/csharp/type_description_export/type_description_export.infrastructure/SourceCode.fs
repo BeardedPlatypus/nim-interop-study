@@ -13,4 +13,8 @@ module public SourceCode =
         |> Seq.map (fun fi -> fi.Name)
         |> Seq.toList
 
+    let public readFile (fileName: string) : string = 
+        Path.Combine(path, fileName)
+        |> File.ReadAllLines 
+        |> String.concat "\n"
 

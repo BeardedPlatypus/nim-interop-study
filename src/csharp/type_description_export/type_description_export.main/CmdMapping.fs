@@ -19,7 +19,18 @@ module public CmdMapping =
             return Msg.NoOp
         } |> Cmd.OfAsync.result
 
+    let private loadSourceContentCmd (fileName: option<string>) : Cmd<Msg> =
+        async {
+            do! Async.SwitchToThreadPool ()
+
+            return fileName 
+            |> Option.map (fun v -> SourceCode.readFile(v))
+            |> Msg.UpdateSourceContent
+
+        } |> Cmd.OfAsync.result
+
     let public toCmd (cmdMsg: CmdMsg) : Cmd<Msg> =
         match cmdMsg with
         | CmdMsg.Initialize -> initializeCmd ()  
         | CmdMsg.OpenVisualStudioCode -> openVisualStudioCodeCmd ()
+        | CmdMsg.LoadSourceContent v -> loadSourceContentCmd v
