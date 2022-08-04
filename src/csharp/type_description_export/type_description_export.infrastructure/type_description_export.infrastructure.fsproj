@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="SourceCode.fs" />
     <Compile Include="VisualStudioCode.fs" />
   </ItemGroup>
 
