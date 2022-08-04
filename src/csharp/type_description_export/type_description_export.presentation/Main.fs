@@ -5,6 +5,7 @@ open Elmish.WPF
 module public Main =
     type public Model = 
       { files: List<string>
+        sourceContent: option<string>
       }
 
     [<RequireQualifiedAccess>]
@@ -21,7 +22,7 @@ module public Main =
         | RenameFile of {| oldFile: string; newFile: string |}
         | NoOp
 
-    let public init (): Model * CmdMsg list = { files = [ ] }, [ CmdMsg.Initialize ]
+    let public init (): Model * CmdMsg list = { files = [ ]; sourceContent = option.None }, [ CmdMsg.Initialize ]
 
     let public update (msg: Msg) (model: Model) : Model * CmdMsg list =
         match msg with 
@@ -43,4 +44,5 @@ module public Main =
     let bindings () : Binding<Model, Msg> list = [
           "OpenVisualStudioCommand" |> Binding.cmd(fun (_) -> Msg.RequestOpenVisualStudioCode)
           "FileNames" |> Binding.oneWay(fun (m: Model) -> m.files)
+          "SourceContent" |> Binding.oneWay(fun (m: Model) -> m.sourceContent |> Option.defaultValue "<No file selected>")
     ]

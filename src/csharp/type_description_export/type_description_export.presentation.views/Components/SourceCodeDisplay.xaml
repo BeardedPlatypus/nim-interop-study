@@ -34,7 +34,7 @@
                 <ScrollViewer Grid.Column="1">
                     <TextBlock Margin="6,6,6,6"
                                TextWrapping="Wrap"
-                               Text="Short loin picanha boudin pork belly. Ground round porchetta biltong, cow t-bone tri-tip strip steak chuck filet mignon jowl turducken. Landjaeger strip steak pork chop, jowl sirloin pork capicola andouille. Kevin ribeye tongue, drumstick hamburger frankfurter t-bone corned beef beef biltong cow venison. Biltong picanha bresaola pork belly, filet mignon spare ribs doner pork chop kielbasa. Swine flank drumstick pork belly pancetta spare ribs rump filet mignon." />
+                               Text="{Binding SourceContent}" />
                 </ScrollViewer>
             </Grid>
         </GroupBox>
