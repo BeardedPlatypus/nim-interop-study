@@ -9,11 +9,17 @@ module public Main =
         sourceContent: option<string>
       }
 
+    type public CachedChangeFile = 
+      { fileName: option<string>
+        retryCount: int
+      }
+
     [<RequireQualifiedAccess>]
     type public CmdMsg =
         | Initialize
         | OpenVisualStudioCode
-        | LoadSourceContent of option<string>
+        | LoadSourceContent of CachedChangeFile
+        | RequestSetSelectedFile of option<string>
 
     type public Msg =
         | RequestOpenVisualStudioCode
@@ -22,6 +28,8 @@ module public Main =
         | AddFile of string
         | RemoveFile of string
         | RenameFile of {| oldFile: string; newFile: string |}
+        | ChangeFile of string
+        | ChangeFileCached of CachedChangeFile
         | SetSelectedFile of option<string>
         | NoOp
         | UpdateSourceContent of option<string>
@@ -42,14 +50,35 @@ module public Main =
             { model with files = newFiles }, []
         | RemoveFile toRemove ->
             let newFiles = model.files |> List.filter (fun s -> s <> toRemove)
-            let newSelectedFile = if (Some toRemove) = model.selectedFile then None else model.selectedFile
-            { model with files = newFiles; selectedFile = newSelectedFile }, []
+            let cmdMsgs = 
+                if model.selectedFile |> Option.contains toRemove then 
+                    [ CmdMsg.RequestSetSelectedFile None ] 
+                else 
+                    []
+
+            { model with files = newFiles }, cmdMsgs
         | RenameFile details ->
             let newFiles = details.newFile :: model.files |> List.filter (fun s -> s <> details.oldFile)
                            |> List.sort
-            let newSelectedFile = if (Some details.oldFile) = model.selectedFile then None else model.selectedFile
-            { model with files = newFiles; selectedFile = newSelectedFile }, []
-        | SetSelectedFile v -> { model with selectedFile = v }, [CmdMsg.LoadSourceContent v]
+            let cmdMsgs = 
+                if model.selectedFile |> Option.contains details.oldFile then 
+                    [ CmdMsg.RequestSetSelectedFile (Some details.newFile) ] 
+                else 
+                    []
+
+            { model with files = newFiles }, cmdMsgs
+        | ChangeFile file ->
+            let cmdMsgs = 
+                if model.selectedFile |> Option.contains file then 
+                    [ CmdMsg.LoadSourceContent { fileName = model.selectedFile; retryCount = 0 } ] 
+                else 
+                    []
+            model, cmdMsgs
+        | ChangeFileCached v ->
+            model, [ CmdMsg.LoadSourceContent { v with retryCount = v.retryCount + 1 } ]
+        | SetSelectedFile v -> 
+            { model with selectedFile = v }, 
+            [ CmdMsg.LoadSourceContent { fileName = v; retryCount = 0 } ]
         | UpdateSourceContent v -> {model with sourceContent = v }, []
         | NoOp -> model, []
 

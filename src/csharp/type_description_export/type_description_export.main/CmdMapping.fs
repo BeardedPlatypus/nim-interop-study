@@ -19,18 +19,29 @@ module public CmdMapping =
             return Msg.NoOp
         } |> Cmd.OfAsync.result
 
-    let private loadSourceContentCmd (fileName: option<string>) : Cmd<Msg> =
+    let private loadSourceContentCmd (v: CachedChangeFile) : Cmd<Msg> =
         async {
             do! Async.SwitchToThreadPool ()
 
-            return fileName 
-            |> Option.map (fun v -> SourceCode.readFile(v))
-            |> Msg.UpdateSourceContent
+            if v.retryCount > 5 then 
+                return Msg.NoOp
+            else
+                try 
+                    return v.fileName
+                    |> Option.map (fun v -> SourceCode.readFile(v))
+                    |> Msg.UpdateSourceContent
+                with
+                | :? System.IO.IOException ->
+                    return Msg.ChangeFileCached v
 
         } |> Cmd.OfAsync.result
+
+    let private setSelectedFileCmd (fileName: option<string>) : Cmd<Msg> =
+        Cmd.ofMsg (Msg.SetSelectedFile fileName)
 
     let public toCmd (cmdMsg: CmdMsg) : Cmd<Msg> =
         match cmdMsg with
         | CmdMsg.Initialize -> initializeCmd ()  
         | CmdMsg.OpenVisualStudioCode -> openVisualStudioCodeCmd ()
         | CmdMsg.LoadSourceContent v -> loadSourceContentCmd v
+        | CmdMsg.RequestSetSelectedFile v -> setSelectedFileCmd v
