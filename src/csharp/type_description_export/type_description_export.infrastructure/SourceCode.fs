@@ -1,5 +1,6 @@
 ﻿namespace type_description_export.infrastructure
 
+open System.Diagnostics
 open System.IO
 open System.Runtime.Caching
 
@@ -33,4 +34,13 @@ module public SourceCode =
         |> List.map Path.GetFileNameWithoutExtension
         |> List.map (fun name -> $"import custom-types/{name}")
         |> fun lines -> File.WriteAllLines(path, lines)
+
+    let public compile (): unit =
+        let processStartInfo = ProcessStartInfo("nim", @"c --app:lib -d:release --outdir:./nim ./nim/type_description_export.nim")
+        processStartInfo.UseShellExecute <- false
+        processStartInfo.RedirectStandardOutput <- true
+
+        Process.Start(processStartInfo) |> ignore
+
+
  

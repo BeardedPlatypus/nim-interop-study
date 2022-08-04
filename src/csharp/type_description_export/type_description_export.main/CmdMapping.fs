@@ -43,6 +43,7 @@ module public CmdMapping =
         async {
             do! Async.SwitchToThreadPool ()
             SourceCode.writeCustomTypesFile "./nim/custom_types.nim" v
+            SourceCode.compile ()
 
             return Msg.NoOp
         } |> Cmd.OfAsync.result
