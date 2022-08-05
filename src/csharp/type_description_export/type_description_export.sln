@@ -13,8 +13,6 @@ Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "type_description_export.inf
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "type_description_export.infrastructure.nim", "type_description_export.infrastructure.nim\type_description_export.infrastructure.nim.csproj", "{3763E60A-0B3D-4A10-86D2-C2678B4EF38A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "type_description_export.infrastructure.nim.core", "type_description_export.infrastructure.nim.core\type_description_export.infrastructure.nim.core.csproj", "{AB569085-5915-43AC-9228-3ECEA46889E8}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "type_description_export.common", "type_description_export.common\type_description_export.common.fsproj", "{15953373-428A-47F4-A114-6F1C52FFA796}"
 EndProject
 Global
@@ -43,10 +41,6 @@ Global
 		{3763E60A-0B3D-4A10-86D2-C2678B4EF38A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3763E60A-0B3D-4A10-86D2-C2678B4EF38A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3763E60A-0B3D-4A10-86D2-C2678B4EF38A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB569085-5915-43AC-9228-3ECEA46889E8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB569085-5915-43AC-9228-3ECEA46889E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB569085-5915-43AC-9228-3ECEA46889E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB569085-5915-43AC-9228-3ECEA46889E8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{15953373-428A-47F4-A114-6F1C52FFA796}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{15953373-428A-47F4-A114-6F1C52FFA796}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15953373-428A-47F4-A114-6F1C52FFA796}.Release|Any CPU.ActiveCfg = Release|Any CPU
