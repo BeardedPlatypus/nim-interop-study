@@ -5,10 +5,10 @@ namespace type_description_export.infrastructure.nim;
 
 public sealed class NimLibrary : IDisposable
 {
-    private const string _libraryPath = "./nim/type_description_export.dll";
+    private const string LibraryPath = "./nim/type_description_export.dll";
     private Wrapper? _wrapper = null;
     
-    private class Wrapper : IDisposable
+    private sealed class Wrapper : IDisposable
     {
         private readonly IntPtr _pDLL;
         private readonly Delegates.NimMain _nimMain;
@@ -24,7 +24,7 @@ public sealed class NimLibrary : IDisposable
 
         public Wrapper()
         {
-            _pDLL = NativeLibrary.Load(_libraryPath);
+            _pDLL = NativeLibrary.Load(LibraryPath);
 
             _nimMain = GetDelegate<Delegates.NimMain>(nameof(Delegates.NimMain));
             _getNComponents = GetDelegate<Delegates.get_n_components>(nameof(Delegates.get_n_components));
@@ -99,7 +99,7 @@ public sealed class NimLibrary : IDisposable
         ~Wrapper() => ReleaseUnmanagedResources();
     }
 
-    public bool CanLoad => !HasLoaded && File.Exists(_libraryPath);
+    public bool CanLoad => !HasLoaded && File.Exists(LibraryPath);
     public bool HasLoaded => _wrapper != null;
 
     public void Load()
