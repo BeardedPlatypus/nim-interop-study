@@ -5,7 +5,7 @@ namespace type_description_export.infrastructure.nim.core;
 
 public static class TypeDescriptionExport
 {
-    private const string NameDLL = "main";
+    private const string NameDLL = "type_description_export.dll";
 
     [DllImport(NameDLL)]
     public static extern void NimMain();
