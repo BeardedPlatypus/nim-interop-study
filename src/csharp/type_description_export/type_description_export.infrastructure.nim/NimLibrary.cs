@@ -21,6 +21,8 @@ public sealed class NimLibrary : IDisposable
 
     private class TypeDescriptionExportWrapper
     {
+        private readonly Action _initialize;
+        private readonly Action _free;
         private readonly Action _nimMain;
         private readonly Func<int> _getNComponents;
         private readonly Func<int, int> _getComponentNameLength;
@@ -34,6 +36,8 @@ public sealed class NimLibrary : IDisposable
 
         public TypeDescriptionExportWrapper(Type wrapperType)
         {
+            _initialize = CreateDelegate<Action>(wrapperType, "Initialize");
+            _free = CreateDelegate<Action>(wrapperType, "Free");
             _nimMain = CreateDelegate<Action>(wrapperType, "NimMain");
             _getNComponents = CreateDelegate<Func<int>>(wrapperType, "get_n_components");
             _getComponentNameLength = CreateDelegate<Func<int, int>>(wrapperType, "get_component_name_length");
@@ -49,7 +53,13 @@ public sealed class NimLibrary : IDisposable
         private static T CreateDelegate<T>(Type wrapperType, string methodName) where T : Delegate =>
             wrapperType.GetMethod(methodName, BindingFlags.Public | BindingFlags.Static)?
                        .CreateDelegate<T>(null)
-                ?? throw new InvalidOperationException(); 
+                ?? throw new InvalidOperationException();
+
+        public void Initialize() => 
+            _initialize.Invoke();
+
+        public void Free() =>
+            _free.Invoke();
 
         public void NimMain() => 
             _nimMain.Invoke();
@@ -98,8 +108,9 @@ public sealed class NimLibrary : IDisposable
         if (!HasLoaded) return;
 
         var contextWeakRef = new WeakReference(_context, trackResurrection: true);
-        _assembly = null;
+        _wrapper!.Free();
         _wrapper = null;
+        _assembly = null;
 
         _context?.Unload();
         _context = null;
@@ -118,6 +129,7 @@ public sealed class NimLibrary : IDisposable
         // Assumption: Initialize is only called when the NimLibrary is loaded.
         var typeDescriptionExportType = _assembly?.GetType("type_description_export.infrastructure.nim.core.TypeDescriptionExport") ?? throw new InvalidOperationException();
         _wrapper = new TypeDescriptionExportWrapper(typeDescriptionExportType);
+        _wrapper.Initialize();
         _wrapper.NimMain();
     }
 
@@ -182,4 +194,5 @@ public sealed class NimLibrary : IDisposable
 
         GC.SuppressFinalize(this);
     }
+
 }

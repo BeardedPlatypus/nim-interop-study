@@ -5,7 +5,14 @@ namespace type_description_export.infrastructure.nim.core;
 
 public static class TypeDescriptionExport
 {
-    private const string NameDLL = "type_description_export.dll";
+    private static IntPtr _libraryHandle;
+    public static void Initialize() => 
+        _libraryHandle = NativeLibrary.Load(NameDLL);
+
+    public static void Free() =>
+        NativeLibrary.Free(_libraryHandle);
+
+    private const string NameDLL = "./nim/type_description_export.dll";
 
     [DllImport(NameDLL)]
     public static extern void NimMain();
