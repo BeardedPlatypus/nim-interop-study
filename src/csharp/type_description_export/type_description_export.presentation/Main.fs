@@ -1,13 +1,14 @@
 ﻿namespace type_description_export.presentation
 
 open Elmish.WPF
+open type_description_export.common.Records
 
 module public Main =
     type public Model = 
       { files: List<string>
         selectedFile: option<string>
         sourceContent: option<string>
-        types: List<string>
+        types: List<ComponentDescription>
         selectedType: option<string>
         typeContent: option<string>
       }
@@ -37,6 +38,7 @@ module public Main =
         | ChangeFileCached of CachedChangeFile
         | SetSelectedFile of option<string>
         | SetSelectedType of option<string>
+        | UpdateTypes of ComponentDescription list
         | NoOp
         | UpdateSourceContent of option<string>
 
@@ -92,6 +94,7 @@ module public Main =
         | SetSelectedType v -> 
             { model with selectedType = v }, [ ]
         | UpdateSourceContent v -> {model with sourceContent = v }, []
+        | UpdateTypes l -> { model with types = l}, []
         | NoOp -> model, []
 
     let bindings () : Binding<Model, Msg> list = [
@@ -102,7 +105,7 @@ module public Main =
               (fun v _ -> SetSelectedFile v)
           )
           "SourceContent" |> Binding.oneWay (fun (m: Model) -> m.sourceContent |> Option.defaultValue "<No file selected>")
-          "Types" |> Binding.oneWay (fun (m: Model) -> m.types)
+          "Types" |> Binding.oneWay (fun (m: Model) -> m.types |> List.map (fun v -> v.componentName))
           "SelectedType" |> Binding.twoWayOpt(
               (fun (m: Model) -> m.selectedType),
               (fun v _ -> SetSelectedType v)

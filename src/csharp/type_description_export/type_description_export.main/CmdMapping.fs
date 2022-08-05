@@ -9,7 +9,6 @@ module public CmdMapping =
     let private initializeCmd () : Cmd<Msg> =
         async {
             do! Async.SwitchToThreadPool ()
-            SourceCode.initializeNim ()
             return Msg.UpdateFiles ( SourceCode.retrieveFileNames() )
         } |> Cmd.OfAsync.result
 
@@ -43,10 +42,16 @@ module public CmdMapping =
     let private compileCmd (v: list<string>) : Cmd<Msg> =
         async {
             do! Async.SwitchToThreadPool ()
+
+            SourceCode.unloadLibrary ()
             SourceCode.writeCustomTypesFile "./nim/custom_types.nim" v
             SourceCode.compile ()
+            SourceCode.loadLibrary ()
+            SourceCode.initialize ()
+            
+            let components = SourceCode.getComponents ()
 
-            return Msg.NoOp
+            return Msg.UpdateTypes components
         } |> Cmd.OfAsync.result
 
     let public toCmd (cmdMsg: CmdMsg) : Cmd<Msg> =
