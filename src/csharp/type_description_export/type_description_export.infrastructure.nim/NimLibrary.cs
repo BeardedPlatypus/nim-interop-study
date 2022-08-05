@@ -5,12 +5,19 @@ namespace type_description_export.infrastructure.nim;
 
 public sealed class NimLibrary : IDisposable
 {
-    private const string LibraryPath = "./nim/type_description_export.dll";
+    private readonly string _libraryPath;
 
     private NimAssemblyLoadContext? _context = null;
     private Assembly? _assembly = null;
     private TypeDescriptionExportWrapper? _wrapper = null;
     private bool _hasDisposed = false;
+
+    public NimLibrary()
+    {
+        _libraryPath = Path.Combine(Directory.GetCurrentDirectory(), 
+                                    "nim", 
+                                    "type_description_export.infrastructure.nim.core.dll");
+    }
 
     private class TypeDescriptionExportWrapper
     {
@@ -75,7 +82,7 @@ public sealed class NimLibrary : IDisposable
             _getTypeName(typeIndex, buffer);
     }
 
-    public bool CanLoad => !HasLoaded && File.Exists(LibraryPath);
+    public bool CanLoad => !HasLoaded && File.Exists(_libraryPath);
     public bool HasLoaded => _context != null;
 
     public void Load()
@@ -83,7 +90,7 @@ public sealed class NimLibrary : IDisposable
         if (!CanLoad) return;
 
         _context = new NimAssemblyLoadContext();
-        _assembly = _context.LoadFromAssemblyPath(LibraryPath);
+        _assembly = _context.LoadFromAssemblyPath(_libraryPath);
     }
 
     public void Unload()
@@ -109,17 +116,16 @@ public sealed class NimLibrary : IDisposable
     public void Initialize()
     {
         // Assumption: Initialize is only called when the NimLibrary is loaded.
-        var typeDescriptionExportType = _assembly?.GetType("TypeDescriptionExport") ?? throw new InvalidOperationException();
+        var typeDescriptionExportType = _assembly?.GetType("type_description_export.infrastructure.nim.core.TypeDescriptionExport") ?? throw new InvalidOperationException();
         _wrapper = new TypeDescriptionExportWrapper(typeDescriptionExportType);
         _wrapper.NimMain();
     }
 
-    public IList<NimTypeDescription> GetComponents()
+    public IEnumerable<NimTypeDescription> GetComponents()
     {
         int nComponents = _wrapper!.GetNumberComponents();
         return Enumerable.Range(0, nComponents)
-                         .Select(GetComponent)
-                         .ToList();
+                         .Select(GetComponent);
     }
 
     private NimTypeDescription GetComponent(int componentIndex) =>
