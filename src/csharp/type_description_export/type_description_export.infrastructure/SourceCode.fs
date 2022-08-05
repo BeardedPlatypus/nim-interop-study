@@ -3,7 +3,9 @@
 open System.Diagnostics
 open System.IO
 open System.Runtime.Caching
-open System.Runtime.InteropServices
+
+open type_description_export.infrastructure.nim
+open type_description_export.common.Records
 
 module public SourceCode =
     let public path : string = "./nim/custom-types/"
@@ -41,11 +43,24 @@ module public SourceCode =
         processStartInfo.UseShellExecute <- false
         processStartInfo.RedirectStandardOutput <- true
 
-        Process.Start(processStartInfo) |> ignore
+        let p = Process.Start(processStartInfo)
+        p.WaitForExit()
 
-    module private NimMain =
-        [<DllImport("nim_main")>]
-        extern void NimMain();
+    let private library : NimLibrary = new NimLibrary();
 
-    let public initializeNim (): unit =
-        NimMain.NimMain ()
+    let public loadLibrary = library.Load
+    let public unloadLibrary = library.Unload
+    let public initialize = library.Initialize
+    let public getComponents () = 
+        let toField (inputDesc: NimFieldDescription) : FieldDescription =
+            { fieldName = inputDesc.Name; typeName = inputDesc.FieldType }
+        let toComponent (inputDesc: NimTypeDescription): ComponentDescription =
+            { componentName = inputDesc.Name
+              fields = inputDesc.Fields |> Seq.map toField |> Seq.toList
+            }
+
+        library.GetComponents ()
+        |> Seq.map toComponent
+        |> Seq.toList
+
+
