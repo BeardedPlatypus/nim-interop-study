@@ -10,7 +10,6 @@ module public Main =
         sourceContent: option<string>
         types: List<ComponentDescription>
         selectedType: option<string>
-        typeContent: option<string>
       }
 
     type public CachedChangeFile = 
@@ -30,7 +29,6 @@ module public Main =
         | RequestOpenVisualStudioCode
         | RequestCompile
         | UpdateFiles of List<string>
-        // These could be combined
         | AddFile of string
         | RemoveFile of string
         | RenameFile of {| oldFile: string; newFile: string |}
@@ -48,7 +46,6 @@ module public Main =
           sourceContent = option.None 
           types = []
           selectedType = option.None
-          typeContent = option.None
         }, [ CmdMsg.Initialize ]
 
     let public update (msg: Msg) (model: Model) : Model * CmdMsg list =
@@ -97,6 +94,17 @@ module public Main =
         | UpdateTypes l -> { model with types = l}, []
         | NoOp -> model, []
 
+    let retrieveSelectedFields (selected: string option) (m: Model): FieldDescription seq =
+        let getFields (v: string) = 
+            ( List.tryFind (fun e -> e.componentName = v) m.types )
+            |> Option.map (fun v -> v.fields)
+            |> Option.defaultWith (fun _ -> [])
+
+        selected 
+        |> (Option.map getFields) 
+        |> (Option.defaultWith (fun _ -> []))
+        |> Seq.ofList
+
     let bindings () : Binding<Model, Msg> list = [
           "OpenVisualStudioCommand" |> Binding.cmd (fun (_) -> Msg.RequestOpenVisualStudioCode)
           "FileNames" |> Binding.oneWay (fun (m: Model) -> m.files)
@@ -110,6 +118,12 @@ module public Main =
               (fun (m: Model) -> m.selectedType),
               (fun v _ -> SetSelectedType v)
           )
-          "TypeContent" |> Binding.oneWay (fun (m: Model) -> m.typeContent |> Option.defaultValue "<no type selected>")
+          "TypeContent" |> (Binding.subModelSeq (
+              (fun (m: Model) -> (retrieveSelectedFields m.selectedType m)), 
+              (fun (e: FieldDescription) -> e.fieldName),
+              (fun () -> [
+                  "FieldName" |> Binding.oneWay (fun (_, m) -> m.fieldName)
+                  "TypeName" |> Binding.oneWay (fun (_, m) -> m.typeName)
+              ])))
           "CompileCommand" |> Binding.cmd (fun (_) -> Msg.RequestCompile)
     ]

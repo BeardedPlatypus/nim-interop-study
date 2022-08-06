@@ -34,9 +34,25 @@
                 </DockPanel>
                 
                 <ScrollViewer Grid.Column="1">
-                    <TextBlock Margin="6,6,6,6"
-                               TextWrapping="Wrap"
-                               Text="{Binding TypeContent}" />
+                    <ItemsControl ItemsSource="{Binding TypeContent}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding FieldName}" Grid.Column="0"/>
+                                    <TextBlock Text="{Binding TypeName}" Grid.Column="1"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel Orientation="Vertical"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl> 
                 </ScrollViewer>
             </Grid>
         </GroupBox>
