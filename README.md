@@ -26,3 +26,4 @@ This repository currently contains the following samples:
 * `type_description_export`: A simple GUI capable of showing nim-code and visualizing the compiled descriptions.
     - [nim folder](src/nim/type_description_export/README.md)
     - [F\# folder](src/csharp/type_description_export/README.md)
+* `memory_mapped_files`: Some simple memory mapped file examples
