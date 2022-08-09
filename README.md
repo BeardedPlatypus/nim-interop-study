@@ -26,6 +26,9 @@ This repository currently contains the following samples:
 * `type_description_export`: A simple GUI capable of showing nim-code and visualizing the compiled descriptions.
     - [nim folder](src/nim/type_description_export/README.md)
     - [F\# folder](src/csharp/type_description_export/README.md)
-* `memory_mapped_files`: Some simple memory mapped file examples
+* `memory_mapped_files`: Some simple memory mapped file examples.
     - [nim folder](src/nim/memory_mapped_file/README.md)
     - [C\# folder](src/csharp/memory_mapped_file/README.md)
+* `external_dll_link`: An example linking a Nim compilation to some external DLL made in C++.
+    - [nim folder](src/nim/dll_link/README.md)
+    - [C++ folder](src/cpp/dll_link/README.md)
