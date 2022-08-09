@@ -27,3 +27,5 @@ This repository currently contains the following samples:
     - [nim folder](src/nim/type_description_export/README.md)
     - [F\# folder](src/csharp/type_description_export/README.md)
 * `memory_mapped_files`: Some simple memory mapped file examples
+    - [nim folder](src/nim/memory_mapped_file/README.md)
+    - [C\# folder](src/csharp/memory_mapped_file/README.md)
