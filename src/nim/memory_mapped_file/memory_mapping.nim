@@ -1,3 +1,4 @@
+{.compile: "mapping.c".}
 import std/memfiles
 import std/streams
 import winlean
@@ -42,18 +43,22 @@ import os
 #    setPosition(memoryMappedFileStream, 0)
 #    echo peekInt32(memoryMappedFileStream)
 
-proc newEIO(msg: string): ref IOError =
-  new(result)
-  result.msg = msg
+# proc newEIO(msg: string): ref IOError =
+#  new(result)
+#  result.msg = msg
+
+proc CreateBufferFile() {.importc.}
+proc CreateBuffer(hMapFile: pointer): pointer {.importc.}
+proc FreeBuffer(hMapFile: pointer): void {.importc.}
 
 # NOTE: This currently support windows only
-proc openNotPersisted*(filename: string, 
-                       mode: FileMode = fmRead,
-                       mappedSize = -1, 
-                       offset = 0, 
-                       newFileSize = -1,
-                       allowRemap = false, 
-                       mapFlags = cint(-1)): MemFile =
+# proc openNotPersisted*(filename: string, 
+#                       mode: FileMode = fmRead,
+#                       mappedSize = -1, 
+#                       offset = 0, 
+#                       newFileSize = -1,
+#                       allowRemap = false, 
+#                       mapFlags = cint(-1)): MemFile =
   ## opens a memory mapped file. If this fails, `OSError` is raised.
   ##
   ## `newFileSize` can only be set if the file does not exist and is opened
@@ -88,70 +93,94 @@ proc openNotPersisted*(filename: string,
   ##   mm_half = memfiles.open("/tmp/test.mmap", mode = fmReadWrite, mappedSize = 512)
 
   # The file can be resized only when write mode is used:
-  if mode == fmAppend:
-    raise newEIO("The append mode is not supported.")
 
-  var readonly = mode == fmRead
+#  if mode == fmAppend:
+#    raise newEIO("The append mode is not supported.")
+# 
+#  var readonly = mode == fmRead
+# 
+#  when defined(windows):
+#    
+#    let cFileName: cstring = filename
+#    echo repr(cFileName)
+# 
+#    result.fHandle = INVALID_HANDLE_VALUE
+# 
+#    let v = ['G','l','o','b','a','l', '\\', 't', 'e', 's', 't', '\0']
+#    echo ""
+#    echo repr(v)
+# 
+#    echo ""
+#    let pBuffer = CreateBuffer()
+#    echo repr(pBuffer)
+#    result.mapHandle = pBuffer
+#    
+#    # result.mapHandle = createFileMappingW(
+#    #   INVALID_HANDLE_VALUE,                             # Use paging file
+#    #   nil,                                              # Default security
+#    #   if readonly: PAGE_READONLY else: PAGE_READWRITE,  # Read and write access definition
+#    #   0, 
+#    #   cast[int32](newFileSize), 
+#    #   v[0].unsafeAddr)
+#    #  result.mapHandle = createFileMappingW(
+#    #     INVALID_HANDLE_VALUE, 
+#    #     nil,
+#    #     PAGE_READONLY,
+#    #     0,
+#    #     0,
+#    #     cFileName.unsafeAddr
+#    # )
+# 
+#    echo result.mapHandle
+# 
+#    result.mem = mapViewOfFileEx(
+#      result.mapHandle,
+#      if readonly: FILE_MAP_READ else: FILE_MAP_WRITE,
+#      0,
+#      0,
+#      cast[WinSizeT](newFileSize),
+#      nil)
+# 
+#    result.size = newFileSize
+# 
+#    result.wasOpened = true
+#  else:
+#    raise newEIO("Linux is not supported.")
 
-  when defined(windows):
-    
-    let cFileName: cstring = filename
-    echo cFileName
-
-    result.fHandle = INVALID_HANDLE_VALUE
-    result.mapHandle = createFileMappingW(
-      INVALID_HANDLE_VALUE,                             # Use paging file
-      nil,                                              # Default security
-      if readonly: PAGE_READONLY else: PAGE_READWRITE,  # Read and write access definition
-      0, 
-      cast[int32](newFileSize), 
-      cFileName.unsafeAddr)
-
-    echo result.mapHandle
-
-    result.mem = mapViewOfFileEx(
-      result.mapHandle,
-      if readonly: FILE_MAP_READ else: FILE_MAP_WRITE,
-      0,
-      0,
-      cast[WinSizeT](newFileSize),
-      nil)
-
-    result.size = newFileSize
-
-    result.wasOpened = true
-  else:
-    raise newEIO("Linux is not supported.")
-
-let mmapName: string = "Global\\memory_mapped_test"
+# let mmapName: string = "Global\\memory_mapped_test"
 # let mmapName: string = "testMemory"
-var memoryMappedFile: MemFile
+# var memoryMappedFile: MemFile
 
-proc read_val*(): int32 {.exportc, dynlib.} =
-    var v: int32 = 0
-    moveMem(v.unsafeAddr, memoryMappedFile.mem, sizeof(int32))
-    return v
+# proc read_val*(): int32 {.exportc, dynlib.} =
+#    var v: int32 = 0
+#    moveMem(v.unsafeAddr, memoryMappedFile.mem, sizeof(int32))
+#    return v
 
-proc write_val*(val: int32) {. exportc, dynlib .} =
+# proc write_val*(val: int32) {. exportc, dynlib .} =
     # writeData(memoryMappedFile, val.unsafeAddr, sizeof(int32))
-    moveMem(memoryMappedFile.mem, val.unsafeAddr, sizeof(int32))
+#    moveMem(memoryMappedFile.mem, val.unsafeAddr, sizeof(int32))
 
 proc initialise_library*() {.exportc, dynlib .} =
-    memoryMappedFile = openNotPersisted(mmapName, fmReadWrite, newFileSize=sizeof(int32))
+    # memoryMappedFile = openNotPersisted(mmapName, fmReadWrite, newFileSize=sizeof(int32))
+    # memoryMappedFile = memfiles.open("memoryTestData", mode=fmReadWriteExisting)
+    CreateBufferFile()
+    # let p2: pointer = CreateBuffer(p1)
+    # echo "test" & repr(p1) # & " | " & repr(p2)
 
-proc get_mmap_name_length*(): int {. exportc, dynlib .} =
-    len(mmapName) + 1
+# proc get_mmap_name_length*(): int {. exportc, dynlib .} =
+#    len(mmapName) + 1
 
-proc get_mmap_name*(buffer: cstring): void {. exportc, dynlib .} =
-    let size = get_mmap_name_length()
-    moveMem(buffer[0].unsafeAddr, mmapName[0].unsafeAddr, size)
+# proc get_mmap_name*(buffer: cstring): void {. exportc, dynlib .} =
+#    let size = get_mmap_name_length()
+#    moveMem(buffer[0].unsafeAddr, mmapName[0].unsafeAddr, size)
 
-proc get_mmap_size*(): int {. exportc, dynlib .} =
-    sizeof(int32)
+# proc get_mmap_size*(): int {. exportc, dynlib .} =
+#    sizeof(int32)
 
-# when (isMainModule):
-#    echo "Initialising..."
-#    initialise_library()
-#    echo "Writing 9 to memory mapped file..."
-#    write_val(9)
-#    echo "Reading value fro memory mapped file: " & $(read_val())
+when (isMainModule):
+   echo "Initialising..."
+   initialise_library()
+   var name: string = readLine(stdin)
+   # echo "Writing 9 to memory mapped file..."
+   # write_val(9)
+   # echo "Reading value fro memory mapped file: " & $(read_val())
