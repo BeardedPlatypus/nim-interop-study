@@ -2,7 +2,7 @@
 
 ## Importing a function in a .c file can be done with `importc` pragma
 
-*See [memory_mapped_file](/src/nim/memory_mapped_file/README.md) for an example.*
+*See [memory_mapped_file](/src/nim/memory_mapped_file/) for an example.*
 
 A function defined in a `.c` file can be forwarded with the following statements:
 
@@ -22,7 +22,7 @@ For more details see [the importc pragma documentation](https://nim-lang.org/doc
 
 ## Importing a function from an external DLL
 
-*See [dll_link](/src/nim/dll_link/README.md) for an example*
+*See [dll_link](/src/nim/dll_link/) for an example*
 
 A function defined in an external DLL can be forwarded with the following statement:
 
@@ -35,7 +35,7 @@ function to be exported as a c function (i.e. with `extern "C"`), and exported t
 
 ```cpp
 #pragma once
-#define DLLAPI __declspec( dllexport ) //Export when building DLL
+#define DLLAPI __declspec( dllexport ) 
 
 #include "sample_struct.hpp"
 
@@ -52,7 +52,7 @@ the different parameters which can be specified.
 
 ## Exporting a function to a dll
 
-*See [memory_mapped_file](/src/nim/memory_mapped_file/README.md) for an example.*
+*See [memory_mapped_file](/src/nim/memory_mapped_file/) for an example.*
 
 A function defined in Nim can be exported to a DLL by adding the `exportc` and `dynlib`
 pragma's to a proc:
